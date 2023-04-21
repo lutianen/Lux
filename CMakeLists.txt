@@ -10,6 +10,7 @@ project(Lux LANGUAGES CXX)
 
 # 子项目（顺序无关紧要）
 add_subdirectory(LuxUtils)
+add_subdirectory(LuxLog)
 
 # Release
 if(NOT CMAKE_BUILD_TYPE)
