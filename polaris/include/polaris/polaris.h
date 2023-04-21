@@ -12,3 +12,4 @@
 #include <polaris/InetAddress.h>
 #include <polaris/TCPConnection.h>
 #include <polaris/TCPServer.h>
+#include <polaris/TCPClient.h>

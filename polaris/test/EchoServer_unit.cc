@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 #include <cstdio>
+#include <cstdlib>
 #include <functional>
 #include <utility>
 
@@ -19,18 +20,18 @@ private:
     TCPServer server_;
 
     void onConnection(const TCPConnectionPtr& conn) {
-        LOG_TRACE << conn->peerAddress().toIpPort() << " -> "
-                  << conn->localAddress().toIpPort() << " is "
-                  << (conn->connected() ? "up" : "down");
+        LOG_INFO << conn->peerAddress().toIpPort() << " -> "
+                 << conn->localAddress().toIpPort() << " is "
+                 << (conn->connected() ? "up" : "down");
 
-        LOG_INFO << conn->getTcpInfoString();
+        LOG_TRACE << conn->getTcpInfoString();
         conn->send("Hello\n");
     }
 
     void onMessage(const TCPConnectionPtr& conn, Buffer* buf, Timestamp time) {
         string msg(buf->retrieveAllAsString());
-        LOG_TRACE << conn->name() << " recv " << msg.size() << " bytes at "
-                  << time.toString();
+        LOG_INFO << conn->name() << " recv " << msg.size() << " bytes at "
+                 << time.toString();
         if (msg == "exit\n") {
             conn->send("bye\n");
             conn->shutdown();
@@ -56,18 +57,22 @@ public:
 };
 
 int main(int argc, char* argv[]) {
-    Logger::setLogLevel(Logger::LogLevel::INFO);
-
     LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
     LOG_INFO << "sizeof TCPConnection = " << sizeof(TCPConnection);
 
-    if (argc < 4) {
-        LOG_INFO << "EchoServer <ip> <port> <numsThreads>";
-    }
+    // if (argc < 4) {
+    //     printf("Usage: %s host_ip port [threads#]\n", argv[0]);
+    //     return -1;
+    // }
 
-    string ip = argv[1];
-    uint16_t port = atoi(argv[2]);
-    numThreads = atoi(argv[3]);
+    string ip = "127.0.0.1";
+    uint16_t port = 5836;
+
+    if (argc > 4) {
+        ip = argv[1];
+        uint16_t port = atoi(argv[2]);
+        numThreads = atoi(argv[3]);
+    }
 
     EventLoop loop;
     InetAddress listenAddr(ip, port, false);
