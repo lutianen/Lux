@@ -30,7 +30,7 @@
  *         问，特别是在catch子句内也无法访问。如果一段程序没有try语句块且发生了异常，系
  *         统会调用terminate函数并终止当前程序的执行。
  *
- * @author Tianen Lu (tianenlu957@gmail.com)
+ * @author Tianen Lu
  */
 
 #pragma once

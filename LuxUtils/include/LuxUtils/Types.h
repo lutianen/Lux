@@ -2,7 +2,7 @@
  * @file types.h
  * @brief memZero implicit_cast down_cast
  *
- * @author Tianen Lu (tianenlu957@gmail.com)
+ * @author Tianen Lu
  */
 
 #pragma once

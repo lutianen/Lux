@@ -2,7 +2,7 @@
  * @file FileUtil.h
  * @brief
  *
- * @author Tianen Lu (tianenlu957@gmail.com)
+ * @author Tianen Lu
  */
 
 #pragma once

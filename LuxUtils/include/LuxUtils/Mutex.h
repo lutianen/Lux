@@ -7,7 +7,7 @@
  *  对互斥量加锁调用 int pthread_mutex_lock(pthread_mutex_t *mutex)
  *  对互斥量解锁锁调用 int pthread_mutex_unlock(pthread_mutex_t *mutex)
  *
- * @author Tianen Lu (tianenlu957@gmail.com)
+ * @author Tianen Lu
  */
 
 #pragma once

@@ -3,7 +3,7 @@
  * @brief 原子类型是封装了一个值的类型.
  *  它的访问保证不会导致数据的竞争，并且可以用于在不同的线程之间同步内存访问.
  *
- * @author Tianen Lu (tianenlu957@gmail.com)
+ * @author Tianen Lu
  */
 
 #pragma once

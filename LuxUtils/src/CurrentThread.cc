@@ -2,7 +2,7 @@
  * @file CurrentThread.cc
  * @brief
  *
- * @author Tianen Lu (tianenlu957@gmail.com)
+ * @author Tianen Lu
  */
 
 #include "LuxUtils/CurrentThread.h"

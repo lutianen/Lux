@@ -19,7 +19,7 @@
  *                2. wait()
  *                   使用条件变量等待计数器减到零，然后notify
  *
- * @author Tianen Lu (tianenlu957@gmail.com)
+ * @author Tianen Lu
  */
 
 #pragma once

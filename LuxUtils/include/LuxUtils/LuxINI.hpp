@@ -17,7 +17,7 @@
  * #define KEY_UPPER  // [Default] KEY_NOT_CASE_SENSITIVE and TRANSFORM to UPPER
  * ------------------
  *
- * @author Tian-en Lu (tianenlu957@gmail.com)
+ * @author Lux
  */
 
 #ifndef LUX_INI_H

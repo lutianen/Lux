@@ -22,4 +22,5 @@ target_link_libraries(TimestampTest PRIVATE LuxUtils)
 add_executable(LuxINITest LuxINI_unit.cc)
 target_link_libraries(LuxINITest PRIVATE LuxUtils)
 
-
+add_executable(AnyTest Any_unit.cc)
+target_link_libraries(AnyTest PRIVATE LuxUtils)

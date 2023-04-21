@@ -14,7 +14,7 @@
  *  pthread_cond_signal 至少唤醒一个等待该条件的线程
  *  pthread_cond_broadcast 唤醒等待该条件的所有线程
  *
- * @author Tianen Lu (tianenlu957@gmail.com)
+ * @author Tianen Lu
  */
 
 #pragma once

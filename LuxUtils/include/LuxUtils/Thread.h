@@ -4,7 +4,7 @@
  *      start 调用线程函数
  *      join 等待主线程回收
  *
- * @author Tianen Lu (tianenlu957@gmail.com)
+ * @author Tianen Lu
  */
 
 #pragma once
