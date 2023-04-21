@@ -82,7 +82,7 @@
  * id 的哈希值)。
  * 那些哈希到相同缓冲区的线程，同样是存在争用的情况的，只不过争用的概率被降低了很多。
  *
- * @author Tianen Lu (tianenlu957@gmail.com)
+ * @author Tianen Lu
  */
 
 #include <LuxLog/AsyncLogger.h>

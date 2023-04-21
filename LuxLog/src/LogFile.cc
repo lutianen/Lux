@@ -2,7 +2,7 @@
  * @file LogFile.cc
  * @brief
  *
- * @author Tianen Lu (tianenlu957@gmail.com)
+ * @author Tianen Lu
  */
 
 #include <LuxLog/LogFile.h>
