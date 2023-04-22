@@ -13,6 +13,9 @@ add_subdirectory(LuxUtils)
 add_subdirectory(LuxLog)
 add_subdirectory(polaris)
 
+# HTTP
+add_subdirectory(app)
+
 # Release
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Welcome to My Website</title>
+
+    <style>
+        /* Reset CSS */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Global styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 16px;
+            line-height: 1.5;
+            background-color: #ffffff;
+        }
+
+        /* Welcome section */
+        .welcome {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: linear-gradient(to bottom right,
+                    #4ecdc4,
+                    #4ecdc4,
+                    #4ecdc4);
+            animation: gradient 10s ease infinite;
+            background-size: 400% 400%;
+        }
+
+        /* Gradient animation */
+        @keyframes gradient {
+            0% {
+                background-position: 0 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0 50%;
+            }
+        }
+
+        /* Welcome text */
+        .welcome h1 {
+            font-size: 3rem;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 2rem;
+        }
+
+        /* Form container */
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: 2rem;
+            padding: 2rem;
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Form input field */
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-size: 1rem;
+            outline: none;
+        }
+
+        /* Form submit button */
+        .form-submit {
+            width: 100%;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border: none;
+            border-radius: 0.5rem;
+            background-color: #60b9f4;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-submit:hover {
+            background-color: #60b9f4;
+        }
+    </style>
+</head>
+
+<body>
+    <section class="welcome">
+        <h1>Welcome to My Website</h1>
+        <div class="form-container">
+            <form>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" class="form-input" required/>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" class="form-input" required/>
+                <button type="submit" class="form-submit">Log In</button>
+            </form>
+        </div>
+    </section>
+</body>
+
+</html>
