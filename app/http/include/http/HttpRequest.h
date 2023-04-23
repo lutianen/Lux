@@ -27,6 +27,7 @@ private:
     string query_;
     Timestamp receiveTime_;
     std::map<string, string> headers_;
+    string body_;
 
 public:
     HttpRequest() : method_(Method::kInvalid), version_(Version::kUnknown) {}
@@ -116,13 +117,17 @@ public:
     }
     const std::map<string, string>& headers() const { return headers_; }
 
+    void setBody(const string& body) { body_ = body; }
+    string body() const { return body_; }
+
     void swap(HttpRequest& that) {
         std::swap(method_, that.method_);
         std::swap(version_, that.version_);
         path_.swap(that.path_);
-        query_.swap(that.path_);
+        query_.swap(that.query_);
         receiveTime_.swap(that.receiveTime_);
         headers_.swap(that.headers_);
+        body_.swap(that.body_);
     }
 };
 }  // namespace http

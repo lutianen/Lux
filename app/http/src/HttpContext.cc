@@ -6,6 +6,7 @@
  */
 
 #include <http/HttpContext.h>
+#include "LuxLog/Logger.h"
 
 using namespace Lux;
 
@@ -80,8 +81,8 @@ bool http::HttpContext::parseRequest(polaris::Buffer* buf,
                 } else {
                     // empty line, end of header
                     // FIXME:
-                    state_ = HttpRequestParseState::kGotAll;
-                    hasMore = false;
+//                    state_ = HttpRequestParseState::kGotAll;
+                    state_ = HttpRequestParseState::kExpectBody;
                 }
                 buf->retrieveUntil(crlf + 2);
             } else {
@@ -89,6 +90,11 @@ bool http::HttpContext::parseRequest(polaris::Buffer* buf,
             }
         } else if (state_ == HttpRequestParseState::kExpectBody) {
             // FIXME:
+            string body = buf->retrieveAllAsString();
+            if (!body.empty()) request_.setBody(body);
+
+            state_ = HttpRequestParseState::kGotAll;
+            hasMore = false;
         }
     }
     return ok;
