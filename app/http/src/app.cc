@@ -3,6 +3,7 @@
 #include <http/HttpRequest.h>
 #include <http/HttpResponse.h>
 #include <http/HttpServer.h>
+#include <http/MysqlConn.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -11,6 +12,8 @@
 #include <mysql/mysql.h>
 
 #include <fstream>
+#include <map>
+#include <regex>
 
 using namespace Lux;
 using namespace Lux::polaris;
@@ -18,6 +21,9 @@ using namespace Lux::http;
 
 extern char favicon[555];
 bool benchmark = false;
+
+// username : <mail, password>
+std::map<string, std::pair<string, string>> users;
 
 class Application {
 public:
@@ -33,20 +39,64 @@ private:
     struct stat fileStat_;
     char* fileAddr_;
 
+    // 数据用户名
+    string user_;
+    // 密码
+    string passwd_;
+    // 数据库名
+    string dbName_;
+
 public:
     Application(EventLoop* loop, const InetAddress& listenAddr,
-                const string& name, const string& root)
+                const string& name, const string& root, const string& user,
+                const string& passwd, const string& dbName)
         : loop_(loop),
           server_(loop, listenAddr, name),
           numThreads_(0),
           realFile_(),
           serverPath_(root),
           fileStat_(),
-          fileAddr_(nullptr) {
+          fileAddr_(nullptr),
+          user_(user),
+          passwd_(passwd),
+          dbName_(dbName) {
         memZero(realFile_, FILENAME_LEN);
 
         server_.setHttpCallback(
             std::bind(&Application::onRequest, this, _1, _2));
+
+        MYSQL* mysql = nullptr;
+        mysql = mysql_init(mysql);
+        if (nullptr == mysql) {
+            LOG_ERROR << "MySQL init Error";
+            exit(1);
+        }
+
+        mysql = mysql_real_connect(mysql, "localhost", user_.c_str(),
+                                   passwd_.c_str(), "Luxdb", 3306, nullptr, 0);
+        if (nullptr == mysql) {
+            LOG_ERROR << "MySQL init Error";
+            exit(1);
+        }
+
+        if (mysql_query(mysql, "SELECT username, mail, passwd FROM user")) {
+            LOG_ERROR << "SELECT error: " << mysql_error(mysql);
+        }
+
+        // 从表中检索完整的结果集
+        MYSQL_RES* result = mysql_store_result(mysql);
+
+        // 返回结果集中的列数
+        int numFields = mysql_num_fields(result);
+
+        // 返回所有字段结构的数组
+        MYSQL_FIELD* fields = mysql_fetch_field(result);
+
+        while (MYSQL_ROW row = mysql_fetch_row(result)) {
+            users[row[0]] = {row[1], row[2]};
+        }
+
+        mysql_close(mysql);
     }
     void onRequest(const HttpRequest& req, HttpResponse* resp) {
         LOG_INFO << "Headers " << req.methodString() << " " << req.path();
@@ -63,6 +113,196 @@ public:
             strcat(realFile_, index);
 
             resp->setBody(getHtml());
+        } else if (req.path() == "/register") {
+            LOG_INFO << req.path();
+            resp->setStatusCode(HttpResponse::HttpStatusCode::k200Ok);
+            resp->setStatusMessage("OK");
+            resp->setContentType("text/html");
+            resp->addHeader("Server", "Lux polaris");
+            string body = req.body();
+
+            if (req.method() == HttpRequest::Method::kPost && !body.empty()) {
+                // 处理注册信息 - user, mail, password
+                string username, mail, password;
+                std::regex pattern(
+                    "Username=([0-9a-zA-Z_]+)&email=([0-9a-zA-Z]+\\%40[a-zA-Z]+"
+                    "\\."
+                    "com)&password=([0-9a-zA-Z]+)");
+                for (std::sregex_iterator
+                         iter(body.begin(), body.end(), pattern),
+                     iterend;
+                     iter != iterend; ++iter) {
+                    username = iter->str(1);
+                    mail = iter->str(2);
+                    password = iter->str(3);
+                }
+
+                char* sqlInsert = new char[200];
+                strcpy(sqlInsert,
+                       "INSERT INTO user(username, mail, passwd) VALUES(");
+                strcat(sqlInsert, "'");
+                strcat(sqlInsert, username.c_str());
+                strcat(sqlInsert, "', '");
+                strcat(sqlInsert, mail.c_str());
+                strcat(sqlInsert, "', '");
+                strcat(sqlInsert, password.c_str());
+                strcat(sqlInsert, "')");
+
+                if (users.find(username) == users.end()) {
+                    MYSQL* mysql = nullptr;
+                    mysql = mysql_init(mysql);
+                    if (nullptr == mysql) {
+                        LOG_ERROR << "MySQL init Error";
+                        delete[] sqlInsert;
+                        sqlInsert = nullptr;
+                        exit(1);
+                    }
+
+                    mysql = mysql_real_connect(mysql, "localhost",
+                                               user_.c_str(), passwd_.c_str(),
+                                               "Luxdb", 3306, nullptr, 0);
+                    if (nullptr == mysql) {
+                        LOG_ERROR << "MySQL init Error";
+                        delete[] sqlInsert;
+                        sqlInsert = nullptr;
+                        exit(1);
+                    }
+
+                    int ret = mysql_query(mysql, sqlInsert);
+                    users[username] = {mail, password};
+
+                    // 成功
+                    if (!ret) {
+                        strcpy(realFile_, serverPath_.c_str());
+                        int len = strlen(realFile_);
+                        const char* index = "/welcome.html";
+                        strcat(realFile_, index);
+                        delete[] sqlInsert;
+                        sqlInsert = nullptr;
+                        mysql_close(mysql);
+                    } else {
+                        LOG_ERROR << "SELECT error: " << mysql_error(mysql);
+                        delete[] sqlInsert;
+                        sqlInsert = nullptr;
+                        mysql_close(mysql);
+                    }
+                } else {
+                    strcpy(realFile_, serverPath_.c_str());
+                    int len = strlen(realFile_);
+                    const char* index = "/registerFailed.html";
+                    strcat(realFile_, index);
+                }
+            } else {
+                strcpy(realFile_, serverPath_.c_str());
+                int len = strlen(realFile_);
+                const char* index = "/register.html";
+                strcat(realFile_, index);
+            }
+
+            resp->setBody(getHtml());
+        } else if (req.path() == "/welcome") {
+            resp->setStatusCode(HttpResponse::HttpStatusCode::k200Ok);
+            resp->setStatusMessage("OK");
+            resp->setContentType("text/html");
+            resp->addHeader("Server", "Lux polaris");
+
+            strcpy(realFile_, serverPath_.c_str());
+            int len = strlen(realFile_);
+            const char* index = "/welcome.html";
+            strcat(realFile_, index);
+
+            resp->setBody(getHtml());
+
+        } else if (req.path().find(".jpg") != string::npos) {
+            resp->setStatusCode(HttpResponse::HttpStatusCode::k200Ok);
+            resp->setStatusMessage("OK");
+            resp->setContentType("image/jpg");
+            resp->addHeader("Server", "Lux polaris");
+
+            strcpy(realFile_, serverPath_.c_str());
+            int len = strlen(realFile_);
+            const char* index = req.path().c_str();
+            strcat(realFile_, index);
+
+            LOG_INFO << realFile_;
+
+            // NO resource
+            if (stat(realFile_, &fileStat_) < 0) return;
+            // FORBIDDEN REQUEST
+            if (!(fileStat_.st_mode & S_IROTH)) return;
+            // BAD_REQUEST
+            if (S_ISDIR(fileStat_.st_mode)) return;
+
+            std::ifstream ifs(realFile_, std::ios::ios_base::binary);
+            if (!ifs.is_open()) {
+                LOG_ERROR << "Open " << realFile_ << " failed";
+                resp->setBody("");
+            } else {
+                //将文件读入到ostringstream对象buf中
+                std::ostringstream buf{};
+                char ch;
+                while (buf && ifs.get(ch)) buf.put(ch);
+
+                resp->setBody(buf.str());
+            }
+        } else if (req.method() == HttpRequest::Method::kGet &&
+                   req.path().find("/login") != std::string::npos) {
+            LOG_INFO << req.path();
+            LOG_INFO << req.query();
+
+            std::regex pattern(
+                "\\?Username=([0-9a-zA-Z]+)&password=([0-9a-zA-Z]+)");
+
+            string query = req.query(), username, passwd;
+            for (std::sregex_iterator iter(query.begin(), query.end(), pattern),
+                 iterEnd;
+                 iter != iterEnd; ++iter) {
+                username = iter->str(1);
+                passwd = iter->str(2);
+            }
+
+            // 利用全局缓存，不用连接数据库
+            // FIXME 使用 Redis 缓存
+            if (users.find(username) != users.end()) {
+                if (users.at(username).second == passwd) {
+                    resp->setStatusCode(HttpResponse::HttpStatusCode::k200Ok);
+                    resp->setStatusMessage("OK");
+                    resp->setContentType("text/html");
+                    resp->addHeader("Server", "Lux polaris");
+
+                    strcpy(realFile_, serverPath_.c_str());
+                    int len = strlen(realFile_);
+                    const char* index = "/welcome.html";
+                    strcat(realFile_, index);
+
+                    resp->setBody(getHtml());
+                } else {
+                    resp->setStatusCode(HttpResponse::HttpStatusCode::k200Ok);
+                    resp->setStatusMessage("OK");
+                    resp->setContentType("text/html");
+                    resp->addHeader("Server", "Lux polaris");
+
+                    strcpy(realFile_, serverPath_.c_str());
+                    int len = strlen(realFile_);
+                    const char* index = "/loginFailed.html";
+                    strcat(realFile_, index);
+
+                    resp->setBody(getHtml());
+                }
+            } else {
+                resp->setStatusCode(HttpResponse::HttpStatusCode::k200Ok);
+                resp->setStatusMessage("OK");
+                resp->setContentType("text/html");
+                resp->addHeader("Server", "Lux polaris");
+
+                strcpy(realFile_, serverPath_.c_str());
+                int len = strlen(realFile_);
+                const char* index = "/loginFailed.html";
+                strcat(realFile_, index);
+
+                resp->setBody(getHtml());
+            }
+
         } else {
             resp->setStatusCode(HttpResponse::HttpStatusCode::k404NotFound);
             resp->setStatusMessage("Not Found");
@@ -87,7 +327,7 @@ public:
 
 private:
     string getHtml() {
-        string ret;
+        string ret{};
 
         // NO resource
         if (stat(realFile_, &fileStat_) < 0) return ret;
@@ -100,53 +340,16 @@ private:
         if (!ifs.is_open()) {
             LOG_ERROR << "Open " << realFile_ << " failed";
         } else {
-            char* buf = new char[fileStat_.st_size];
-            memZero(buf, fileStat_.st_size);
-            ifs.read(buf, fileStat_.st_size);
-            ret = buf;
-            delete[] buf;
+            //将文件读入到ostringstream对象buf中
+            std::ostringstream buf{};
+            char ch;
+            while (buf && ifs.get(ch)) buf.put(ch);
+
+            return buf.str();
         }
         return ret;
     }
 };
-
-// void onRequest(const HttpRequest& req, HttpResponse* resp) {
-//     std::cout << "Headers " << req.methodString() << " " << req.path()
-//               << std::endl;
-//     if (!benchmark) {
-//         const std::map<string, string>& headers = req.headers();
-//         for (const auto& header : headers) {
-//             std::cout << header.first << ": " << header.second << std::endl;
-//         }
-//     }
-
-//     if (req.path() == "/") {
-//         resp->setStatusCode(HttpResponse::HttpStatusCode::k200Ok);
-//         resp->setStatusMessage("OK");
-//         resp->setContentType("text/html");
-//         resp->addHeader("Server", "Lux polaris");
-//         string now = Timestamp::now().toFormattedString();
-//         resp->setBody(
-//             "<html><head><title>This is title</title></head>"
-//             "<body><h1>Hello</h1>Now is " +
-//             now + "</body></html>");
-//     } else if (req.path() == "/favicon.ico") {
-//         resp->setStatusCode(HttpResponse::HttpStatusCode::k200Ok);
-//         resp->setStatusMessage("OK");
-//         resp->setContentType("image/png");
-//         resp->setBody(string(favicon, sizeof favicon));
-//     } else if (req.path() == "/hello") {
-//         resp->setStatusCode(HttpResponse::HttpStatusCode::k200Ok);
-//         resp->setStatusMessage("OK");
-//         resp->setContentType("text/plain");
-//         resp->addHeader("Server", "Muduo");
-//         resp->setBody("hello, world!\n");
-//     } else {
-//         resp->setStatusCode(HttpResponse::HttpStatusCode::k404NotFound);
-//         resp->setStatusMessage("Not Found");
-//         resp->setCloseConnection(true);
-//     }
-// }
 
 int main(int argc, char* argv[]) {
     int numThreads = 0;
@@ -155,6 +358,11 @@ int main(int argc, char* argv[]) {
         Logger::setLogLevel(Logger::LogLevel::WARN);
         numThreads = atoi(argv[1]);
     }
+
+    const string user = "lutianen";
+    const string passwd = "lutianen";
+    const string db = "Luxbd";
+
     EventLoop loop;
     // HttpServer server(&loop, InetAddress(8001), "dummy");
     // server.setHttpCallback(onRequest);
@@ -163,7 +371,7 @@ int main(int argc, char* argv[]) {
     // loop.loop();
 
     Application app(&loop, InetAddress(5836), string("Server"),
-                    string("/home/lutianen/Lux/app/HTML"));
+                    string("/home/lutianen/Lux/app/HTML"), user, passwd, db);
     app.start();
     loop.loop();
 }
