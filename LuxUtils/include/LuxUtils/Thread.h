@@ -34,13 +34,15 @@ private:
 
     bool started_;
     bool joined_;
-    /* pthread_t 不适合做程序中对线程的标识符 */
+    /* pthread_t 不适合做程序中对线程的标识符, 只在进程内具有唯一性 */
     pthread_t pthreadId_;
+    // 在操纵系统内具有全局唯一性，采用递增轮回法进行分配
     pid_t tid_;
+    // 线程函数
     ThreadFunc func_;
     std::string name_;
     CountDownLatch latch_;
-
+    // 用于线程池
     static AtomicInt32 numCreated_;
 
 public:
