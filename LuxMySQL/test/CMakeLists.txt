@@ -1,0 +1,2 @@
+add_executable(MySQLConnPoolTest MySQLConnPool_unit.cc)
+target_link_libraries(MySQLConnPoolTest PRIVATE LuxUtils LuxMySQL mysqlclient)
