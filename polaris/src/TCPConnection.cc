@@ -327,7 +327,7 @@ void TCPConnection::handleRead(Timestamp receiveTime) {
     // 正常读到数据
     if (n > 0) {
         messageCallback_(shared_from_this(), &inputBuffer_, receiveTime);
-    } else if (n == 0) /* 对方已关闭TCP连接 */ {
+    } else if (n == 0) /* 读取到文件末尾，则关闭 TCP 连接 */ {
         handleClose();
     } else /* 读取出错 */ {
         errno = savedErrno;

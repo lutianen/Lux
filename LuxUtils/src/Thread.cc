@@ -57,6 +57,9 @@ public:
 
 ThreadNameInitializer init;
 
+/**
+ * @brief func_ / name_ / tid_ / latch_
+ */
 struct ThreadData {
     using ThreadFunc = Lux::Thread::ThreadFunc;
 
