@@ -1,16 +1,22 @@
 /**
  * @file MysqlConn.h
- * @brief
+ * @brief MySQL 连接的 RAII 实现
  *
  * @author Lux
  */
+
+#pragma once
 
 #include <LuxLog/Logger.h>
 #include <LuxUtils/Types.h>
 #include <mysql/mysql.h>
 
+namespace Lux {
+namespace mysql {
+
 class MySQLConn {
 private:
+    // TODO use std::unique_ptr
     MYSQL* connPtr_;
 
     std::string url_;
@@ -46,3 +52,5 @@ public:
 
     ~MySQLConn() { mysql_close(connPtr_); }
 };
+}  // namespace mysql
+}  // namespace Lux

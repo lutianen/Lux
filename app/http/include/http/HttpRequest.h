@@ -36,7 +36,9 @@ public:
     Version getVersion() const { return version_; }
 
     bool setMethod(const char* start, const char* end) {
+#ifndef NDEBUG
         assert(method_ == Method::kInvalid);
+#endif
 
         string m(start, end);
         if (m == "GET")

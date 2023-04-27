@@ -44,9 +44,11 @@ public:
         : buffer_(kCheapPrepend + initialSize),
           readerIndex_(kCheapPrepend),
           writerIndex_(kCheapPrepend) {
+#ifndef NDEBUG
         assert(readableBytes() == 0);
         assert(writableBytes() == initialSize);
         assert(prependableBytes() == kCheapPrepend);
+#endif
     }
 
     // implicit copy-ctor, move-ctor, dtor and assignment are fine
@@ -73,10 +75,14 @@ public:
     /// @brief Peek int64_t from network endian
     /// Require: buf->readableBytes() >= sizeof(int64_t)
     inline int64_t peekInt64() const {
+#ifndef NDEBUG
         assert(readableBytes() >= sizeof(int64_t));
+#endif
         int64_t be64 = 0;
         ::memcpy(&be64, peek(), sizeof be64);
+#ifndef NDEBUG
         assert(be64 >= 0);
+#endif
         return static_cast<int64_t>(
             sockets::networkToHost64(static_cast<uint64_t>(be64)));
     }
@@ -84,25 +90,35 @@ public:
     /// @brief Peek int32_t from network endian
     /// Require: buf->readableBytes() >= sizeof(int64_t)
     inline int32_t peekInt32() const {
+#ifndef NDEBUG
         assert(readableBytes() >= sizeof(int32_t));
+#endif
         int32_t be32 = 0;
         ::memcpy(&be32, peek(), sizeof be32);
+#ifndef NDEBUG
         assert(be32 >= 0);
+#endif
         return static_cast<int32_t>(
             sockets::networkToHost32(static_cast<uint32_t>(be32)));
     }
 
     inline int16_t peekInt16() const {
+#ifndef NDEBUG
         assert(readableBytes() >= sizeof(int16_t));
+#endif
         int16_t be16 = 0;
         ::memcpy(&be16, peek(), sizeof be16);
+#ifndef NDEBUG
         assert(be16 >= 0);
+#endif
         return static_cast<int16_t>(
             sockets::networkToHost16(static_cast<uint16_t>(be16)));
     }
 
     inline int8_t peekInt8() const {
+#ifndef NDEBUG
         assert(readableBytes() >= sizeof(int8_t));
+#endif
         int8_t x = *peek();
         return x;
     }
@@ -117,9 +133,10 @@ public:
     }
 
     inline const char* findCRLF(const char* start) const {
+#ifndef NDEBUG
         assert(peek() <= start);
         assert(start <= beginWrite());
-
+#endif
         const char* crlf = std::search(start, beginWrite(), kCRLF, kCRLF + 2);
         return crlf == beginWrite() ? nullptr : crlf;
     }
@@ -132,9 +149,10 @@ public:
     }
 
     inline const char* findEOL(const char* start) const {
+#ifndef NDEBUG
         assert(peek() <= start);
         assert(start <= beginWrite());
-
+#endif
         const void* eol =
             memchr(start, '\n', static_cast<size_t>(beginWrite() - start));
         return static_cast<const char*>(eol);
@@ -149,7 +167,9 @@ public:
     }
 
     inline void retrieve(size_t len) {
+#ifndef NDEBUG
         assert(len <= readableBytes());
+#endif
         if (len < readableBytes()) {
             readerIndex_ += len;
         } else {
@@ -158,8 +178,10 @@ public:
     }
 
     inline void retrieveUntil(const char* end) {
+#ifndef NDEBUG
         assert(peek() <= end);
         assert(end <= beginWrite());
+#endif
 
         retrieve(static_cast<size_t>(end - peek()));
     }
@@ -174,7 +196,9 @@ public:
     }
 
     inline std::string retrieveAsString(size_t len) {
+#ifndef NDEBUG
         assert(len <= readableBytes());
+#endif
         std::string result(peek(), len);
         retrieve(len);
         return result;
@@ -192,16 +216,22 @@ public:
         if (writableBytes() < len) {
             makeSpace(len);
         }
+#ifndef NDEBUG
         assert(writableBytes() >= len);
+#endif
     }
 
     inline void hasWritten(size_t len) {
+#ifndef NDEBUG
         assert(len <= writableBytes());
+#endif
         writerIndex_ += len;
     }
 
     inline void unwrite(size_t len) {
+#ifndef NDEBUG
         assert(len <= readableBytes());
+#endif
         writerIndex_ -= len;
     }
 
@@ -274,7 +304,9 @@ public:
     }
 
     inline void prepend(const void* /*restrict*/ data, size_t len) {
+#ifndef NDEBUG
         assert(len <= prependableBytes());
+#endif
         readerIndex_ -= len;
         const char* d = static_cast<const char*>(data);
         std::copy(d, d + len, begin() + readerIndex_);
@@ -329,14 +361,18 @@ private:
             buffer_.resize(writerIndex_ + len);
         } else {
             // move readbale data to the front, make space inside buffer
+#ifndef NDEBUG
             assert(kCheapPrepend < readerIndex_);
+#endif
             size_t readable = readableBytes();
             std::copy(begin() + readerIndex_, begin() + writerIndex_,
                       begin() + kCheapPrepend);
 
             readerIndex_ = kCheapPrepend;
             writerIndex_ = readerIndex_ + readable;
+#ifndef NDEBUG
             assert(readable == readableBytes());
+#endif
         }
     }
 };
