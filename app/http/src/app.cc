@@ -94,22 +94,13 @@ void Application::onRequest(const HttpRequest& req, HttpResponse* resp) {
                 mail = iter->str(2);
                 password = iter->str(3);
             }
-
-            char* sqlInsert = new char[200];
-            strcpy(sqlInsert,
-                   "INSERT INTO user(username, mail, passwd) VALUES(");
-            strcat(sqlInsert, "'");
-            strcat(sqlInsert, username.c_str());
-            strcat(sqlInsert, "', '");
-            strcat(sqlInsert, mail.c_str());
-            strcat(sqlInsert, "', '");
-            strcat(sqlInsert, password.c_str());
-            strcat(sqlInsert, "')");
+            string stmt = "INSERT INTO user(username, mail, passwd) VALUES('" +
+                          username + "', " + mail + ", " + password + "')";
 
             if (users.find(username) == users.end()) {
                 MYSQL* mysql = nullptr;
                 MySQLConn conn(mysql, connPool_);
-                conn.execute(sqlInsert);
+                conn.execute(stmt.c_str());
 
                 // 成功
                 if (!conn.stmtRes_.rc_) {
@@ -118,12 +109,8 @@ void Application::onRequest(const HttpRequest& req, HttpResponse* resp) {
                     int len = strlen(realFile_);
                     const char* index = "/welcome.html";
                     strcat(realFile_, index);
-                    delete[] sqlInsert;
-                    sqlInsert = nullptr;
                 } else {
                     LOG_ERROR << "SELECT error: " << mysql_error(mysql);
-                    delete[] sqlInsert;
-                    sqlInsert = nullptr;
                 }
             } else {
                 strcpy(realFile_, serverPath_.c_str());
