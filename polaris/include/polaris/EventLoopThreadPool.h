@@ -32,9 +32,13 @@ private:
     EventLoop* baseLoop_;
     string name_;
     bool started_;
+    // 线程池中线程的数量
     int numThreads_;
     int next_;
+
+    // 线程池
     std::vector<std::unique_ptr<EventLoopThread>> threads_;
+    //
     std::vector<EventLoop*> loops_;
 
 public:
@@ -52,8 +56,7 @@ public:
     /// @return EventLoop*
     EventLoop* getNextLoop();
 
-    /// @brief with the same hash code, it will always return the same
-    /// EventLoop
+    /// @brief with the same hash code, it will always return the same EventLoop
     /// @param hashCOde
     /// @return EventLoop*
     EventLoop* getLoopForHash(size_t hashCOde);

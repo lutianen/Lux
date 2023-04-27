@@ -1,5 +1,5 @@
 /**
- * @file EventLoopThreadPool.cck
+ * @file EventLoopThreadPool.cc
  * @brief
  *
  * @author Lux
@@ -25,10 +25,10 @@ EventLoopThreadPool::EventLoopThreadPool(EventLoop* baseLoop,
     LOG_DEBUG << "thrs: " << numThreads_;
 }
 
-EventLoopThreadPool::~EventLoopThreadPool() {
-    // Don't delete loop, it's stack variable
-}
+// Don't delete loop, it's stack variable
+EventLoopThreadPool::~EventLoopThreadPool() {}
 
+// 创建线程池
 void EventLoopThreadPool::start(const ThreadInitCallback& cb) {
     assert(!started_);
     baseLoop_->assertInLoopThread();
@@ -75,9 +75,6 @@ EventLoop* EventLoopThreadPool::getLoopForHash(size_t hashCode) {
 std::vector<EventLoop*> EventLoopThreadPool::getAllLoops() {
     baseLoop_->assertInLoopThread();
     assert(started_);
-    if (loops_.empty()) {
-        return std::vector<EventLoop*>(1, baseLoop_);
-    } else {
-        return loops_;
-    }
+
+    return loops_.empty() ? std::vector<EventLoop*>(1, baseLoop_) : loops_;
 }
