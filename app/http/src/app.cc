@@ -49,7 +49,7 @@ Application::Application(EventLoop* loop, const InetAddress& listenAddr,
 
     MYSQL* mysql = nullptr;
     MySQLConn conn(mysql, connPool_);
-    conn.execute("SELECT username, mail FROM user;");
+    conn.execute("SELECT username, mail, passwd FROM user;");
 
     // LOG_INFO << conn.res_.numFields_;
     for (auto& row : conn.stmtRes_.rows_) {
@@ -95,7 +95,7 @@ void Application::onRequest(const HttpRequest& req, HttpResponse* resp) {
                 password = iter->str(3);
             }
             string stmt = "INSERT INTO user(username, mail, passwd) VALUES('" +
-                          username + "', " + mail + ", " + password + "')";
+                          username + "', '" + mail + "', '" + password + "')";
 
             if (users.find(username) == users.end()) {
                 MYSQL* mysql = nullptr;
@@ -323,7 +323,7 @@ int main(int argc, char* argv[]) {
 
         EventLoop loop;
 
-        Application app(&loop, InetAddress(5836), serverName, staticSrcPrefix,
+        Application app(&loop, InetAddress(5836), "Polaris", "/home/lutianen/Lux/app/HTML",
                         dbIp, dbPort, user, passwd, db);
 
         app.setNumThreads(numThreads);
