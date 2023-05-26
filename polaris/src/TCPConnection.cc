@@ -27,8 +27,9 @@ void Lux::polaris::defaultConnectionCallback(const TCPConnectionPtr& conn) {
     // message callback only.
 }
 
-void Lux::polaris::defaultMessageCallback(const TCPConnectionPtr& conn, Buffer* buffer,
-                            Timestamp receiveTime) {
+void Lux::polaris::defaultMessageCallback(const TCPConnectionPtr& conn,
+                                          Buffer* buffer,
+                                          Timestamp receiveTime) {
     buffer->retrieveAll();
 }
 

@@ -6,20 +6,19 @@
  */
 
 #include <http/HttpContext.h>
-#include "LuxLog/Logger.h"
 
 using namespace Lux;
 
 // HTTP/1.1
 // GET /hello HTTP/1.1
-// Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+// Accept: text/html,application/xhtml+xml,application/xml;
 // Accept-Encoding: gzip, deflate
 // Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
 // Cache-Control: max-age=0
 // Connection: keep-alive
 // Host: 192.168.132.128:8000
 // Upgrade-Insecure-Requests: 1
-// User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36
+// User-Agent: ...
 
 bool http::HttpContext::processRequestLine(const char* begin, const char* end) {
     bool succeed = false;
@@ -80,8 +79,6 @@ bool http::HttpContext::parseRequest(polaris::Buffer* buf,
                     request_.addHeader(buf->peek(), colon, crlf);
                 } else {
                     // empty line, end of header
-                    // FIXME:
-//                    state_ = HttpRequestParseState::kGotAll;
                     state_ = HttpRequestParseState::kExpectBody;
                 }
                 buf->retrieveUntil(crlf + 2);
@@ -89,7 +86,6 @@ bool http::HttpContext::parseRequest(polaris::Buffer* buf,
                 hasMore = false;
             }
         } else if (state_ == HttpRequestParseState::kExpectBody) {
-            // FIXME:
             string body = buf->retrieveAllAsString();
             if (!body.empty()) request_.setBody(body);
 

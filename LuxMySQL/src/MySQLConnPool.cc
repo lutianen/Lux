@@ -78,14 +78,18 @@ void MySQLConnPool::init(int capcity, const string& ipAddr, uint16_t port,
         if (nullptr == mysql) {
             /**
                1. MySQL 服务器未运行或无法连接：
-                    确保 MySQL 服务器正在运行，并且您的代码中指定的主机名、端口、用户名和密码正确。
+                    确保 MySQL 服务器正在运行，
+                    并且您的代码中指定的主机名、端口、用户名和密码正确。
                2. MySQL C API 库未正确安装：
-                    请检查您的系统中是否正确安装了 MySQL C API 库。如果没有，请安装正确的库文件。
+                    请检查您的系统中是否正确安装了 MySQL C API库。
+                    如果没有，请安装正确的库文件。
                3. 缺少必要的库文件：
                     如果您使用的是动态链接库，则您的系统中必须存在所需的库文件。
-                    请确保您的系统中安装了所有必要的库文件，包括 MySQL C API 库和其依赖的库文件。
+                    请确保您的系统中安装了所有必要的库文件，
+                    包括 MySQL C API 库和其依赖的库文件。
                4. 内存分配错误：
-                    如果您的系统内存不足，或者您的代码中存在其他内存分配问题，则可能会导致 mysql_init 初始化失败。
+                    如果您的系统内存不足，或者您的代码中存在其他内存分配问题，
+                    则可能会导致 mysql_init 初始化失败。
              */
             LOG_ERROR << "return code: " << -1
                       << "\nError message: Initialize MySQL failed.\n";
