@@ -307,23 +307,32 @@ string Application::getHtml() {
 }
 
 int main(int argc, char* argv[]) {
-    const string dbIp = "192.168.132.131";
-    const uint16_t dbPort = 3306;
-    const string user = "lutianen";
-    const string passwd = "lutianen";
-    const string db = "Luxdb";
+    string dbIp = "192.168.1.108";
+    uint16_t dbPort = 3306;
+    string user = "lutianen";
+    string passwd = "lutianen";
+    string db = "LuxDatabase";
+    string serverName = "LuxPolaris";
+    string staticSrcPrefix = "/home/lux/Lux/app/HTML";
+    uint16_t serverPort = 5836;
+    int numThreads = 8; 
 
     if (argc > 1) {
         benchmark = true;
 
-        const string serverName = argv[1];
-        const string staticSrcPrefix = argv[2];
-        const uint16_t serverPort = atoi(argv[3]);
-        int numThreads = atoi(argv[4]);
+        serverName = argv[1];
+        staticSrcPrefix = argv[2];
+        serverPort = atoi(argv[3]);
+        numThreads = atoi(argv[4]);
+        dbIp = argv[5];
+        dbPort = atoi(argv[6]);
+        user = argv[7];
+        passwd = argv[8];
+        db = argv[9];
 
         EventLoop loop;
 
-        Application app(&loop, InetAddress(5836), serverName, staticSrcPrefix,
+        Application app(&loop, InetAddress(serverPort), serverName, staticSrcPrefix,
                         dbIp, dbPort, user, passwd, db);
 
         app.setNumThreads(numThreads);
@@ -332,7 +341,10 @@ int main(int argc, char* argv[]) {
     } else {
         printf(
             "Usage: %s serverName staticSrcPrefix "
-            "serverPort numThreads \n",
+            "serverPort numThreads "
+            "[IPofMySQLServer[default: 127.0.0.1] PortofMySQLServer[default: 3306] "
+            "UsernameofMySQLServer[default: lutianen] PasswordofMySQLServer[default: lutianen] "
+            "DatabaseofMySQLServer[default: user]]\n",
             argv[0]);
     }
 
