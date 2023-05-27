@@ -1,4 +1,4 @@
-<div align=center><img src="./doc/Lux.png" width=169 height=169></div>
+<div align=center><img src="./doc/Lux2.png"></div>
 
 ***Lux* is a event-driven network library in Linux. This project uses the epoll I/O event notification mechanism, and it supports GET/POST requests for HTTP protocol.**
 
