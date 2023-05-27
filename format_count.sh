@@ -12,6 +12,10 @@ clang-format -i `find LuxMySQL/include/LuxMySQL/ -type f -name *.h`
 clang-format -i `find LuxMySQL/src/ -type f -name *.cc`
 clang-format -i `find LuxMySQL/test/ -type f -name *.cc`
 
+clang-format -i `find LuxRedis/include/LuxRedis/ -type f -name *.h`
+clang-format -i `find LuxRedis/src/ -type f -name *.cc`
+clang-format -i `find LuxRedis/test/ -type f -name *.cc`
+
 clang-format -i `find LuxUtils/include/LuxUtils/ -type f -name *.h`
 clang-format -i `find LuxUtils/src/ -type f -name *.cc`
 clang-format -i `find LuxUtils/test/ -type f -name *.cc`

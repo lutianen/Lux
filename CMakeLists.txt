@@ -13,6 +13,7 @@ add_subdirectory(LuxUtils)
 add_subdirectory(LuxLog)
 add_subdirectory(polaris)
 add_subdirectory(LuxMySQL)
+add_subdirectory(LuxRedis)
 
 # HTTP
 add_subdirectory(app)
