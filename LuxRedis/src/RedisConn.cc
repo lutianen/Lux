@@ -268,7 +268,8 @@ int RedisConn::setKeyLifeTime(const char *key, int keyLen, unsigned int time) {
             command("PERSIST %b", key, static_cast<size_t>(keyLen)));
     else
         reply = reinterpret_cast<redisReply *>(
-            command("EXPIRE %b %u", key, static_cast<size_t>(keyLen)), time);
+            command("EXPIRE %b %u", key, keyLen,
+                    time)); /* TODO keyLen is int rather than size_t */
     REDIS_NORMAL_JUDGE(reply);
 
     int ret{0};

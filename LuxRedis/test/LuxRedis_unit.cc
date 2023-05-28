@@ -75,9 +75,8 @@ int main() {
                   << std::endl;
 
         // ---
-        // FIXME
         std::cout << "Test setKyeLifeTime: "
-                  << conn.setKeyLifeTime(kb.c_str(), 10) << std::endl;
+                  << conn.setKeyLifeTime(kb.c_str(),key.size(), 10) << std::endl;
 
         // ---
         std::unique_ptr<char[]> temp1(new char[128]);
@@ -90,7 +89,6 @@ int main() {
         std::string t1;
         std::cout << conn.getKey(key, t1) << std::endl;
         std::cout << "Test STL getKey: " << t1 << std::endl;
-
 
         std::cout << "Test getLen: " << conn.getLen(kc.c_str(), kc.size())
                   << std::endl;
@@ -189,7 +187,7 @@ int main() {
                   << std::endl;
         std::cout << "Test lpopList: " << lva.get() << std::endl;
 
-         for (int i = 0; i < 2; ++i) {
+        for (int i = 0; i < 2; ++i) {
             std::string v = std::to_string(i);
             conn.lpushList(lka.c_str(), lka.size(), v.c_str(), v.size());
         }
@@ -219,7 +217,7 @@ int main() {
                                     64)
                   << std::endl;
         std::cout << "Test indexList: " << lva.get() << std::endl;
-        
+
         std::string t2;
         std::cout << conn.indexList(lka, index, t2) << std::endl;
         std::cout << "Test STL indexList: " << t2 << std::endl;
