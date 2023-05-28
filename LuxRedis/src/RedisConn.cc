@@ -295,8 +295,16 @@ int RedisConn::getKey(const char *key, int keyLen, char *value, int valueLen) {
     return len;
 }
 int RedisConn::getKey(const std::string &key, std::string &value) {
-    return getKey(key.c_str(), key.size(), const_cast<char *>(value.c_str()),
-                  value.size());
+    redisReply *reply = nullptr;
+    reply = reinterpret_cast<redisReply *>(
+        command("GET %b", key.c_str(), key.size()));
+    REDIS_NORMAL_JUDGE(reply);
+
+    int len = static_cast<int>(reply->len);
+    value = std::string(reply->str, len);
+
+    freeReplyObject(reply);
+    return len;
 }
 
 int RedisConn::getLen(const char *key, int keyLen) {
@@ -331,8 +339,16 @@ int RedisConn::getKeyByRange(const char *key, int keyLen, int start, int end,
 }
 int RedisConn::getKeyByRange(const std::string &key, int start, int end,
                              std::string &value) {
-    return getKeyByRange(key.c_str(), key.size(), start, end,
-                         const_cast<char *>(value.c_str()), value.size());
+    redisReply *reply = nullptr;
+    reply = reinterpret_cast<redisReply *>(
+        command("GETRANGE %b %d %d", key.c_str(), key.size(), start, end));
+    REDIS_NORMAL_JUDGE(reply);
+
+    int len = static_cast<int>(reply->len);
+    value = std::string(reply->str, len);
+
+    freeReplyObject(reply);
+    return len;
 }
 
 int RedisConn::getKeyRemainLifeTime(const char *key, int keyLen) {
@@ -366,8 +382,16 @@ int RedisConn::getKeyType(const char *key, int keyLen, char *valueType,
     return len;
 }
 int RedisConn::getKeyType(const std::string &key, std::string &valueType) {
-    return getKeyType(key.c_str(), key.size(),
-                      const_cast<char *>(valueType.c_str()), valueType.size());
+    redisReply *reply = nullptr;
+    reply = reinterpret_cast<redisReply *>(
+        command("TYPE %b", key.c_str(), key.size()));
+    REDIS_NORMAL_JUDGE(reply);
+
+    int len = static_cast<int>(reply->len);
+    valueType = std::string(reply->str, reply->len + 1);
+
+    freeReplyObject(reply);
+    return len;
 }
 
 int RedisConn::delKey(const char *key, int keyLen) {
@@ -512,8 +536,16 @@ int RedisConn::getHField(const char *key, int keyLen, const char *field,
 }
 int RedisConn::getHField(const std::string &key, const std::string &field,
                          std::string &value) {
-    return getHField(key.c_str(), key.size(), field.c_str(), field.size(),
-                     const_cast<char *>(value.c_str()), value.size());
+    redisReply *reply = nullptr;
+    reply = reinterpret_cast<redisReply *>(command(
+        "HGET %b %b", key.c_str(), key.size(), field.c_str(), field.size()));
+    REDIS_NORMAL_JUDGE(reply);
+
+    int len = static_cast<int>(reply->len);
+    value = std::string(reply->str, reply->len);
+
+    freeReplyObject(reply);
+    return len;
 }
 
 int RedisConn::delHField(const char *key, int keyLen, const char *field,
@@ -700,8 +732,16 @@ int RedisConn::lpopList(const char *key, int keyLen, char *value,
 }
 
 int RedisConn::lpopList(const std::string &key, std::string &value) {
-    return lpopList(key.c_str(), key.size(), const_cast<char *>(value.c_str()),
-                    value.size());
+    redisReply *reply = nullptr;
+    reply = reinterpret_cast<redisReply *>(
+        command("LPOP %b", key.c_str(), key.size()));
+    REDIS_NORMAL_JUDGE(reply);
+
+    int len = static_cast<int>(reply->len);
+    value = std::string(reply->str, reply->len);
+    freeReplyObject(reply);
+
+    return len;
 }
 
 int RedisConn::rpushList(const char *key, int keyLen, const char *value,
@@ -742,8 +782,16 @@ int RedisConn::rpopList(const char *key, int keyLen, char *value,
     return len;
 }
 int RedisConn::rpopList(const std::string &key, std::string &value) {
-    return rpopList(key.c_str(), key.size(), const_cast<char *>(value.c_str()),
-                    value.size());
+    redisReply *reply = nullptr;
+    reply = reinterpret_cast<redisReply *>(
+        command("RPOP %b", key.c_str(), key.size()));
+    REDIS_NORMAL_JUDGE(reply);
+
+    int len = (int)reply->len;
+    value = std::string(reply->str, reply->len);
+    freeReplyObject(reply);
+
+    return len;
 }
 
 int RedisConn::indexList(const char *key, int keyLen, int index, char *value,
@@ -766,8 +814,16 @@ int RedisConn::indexList(const char *key, int keyLen, int index, char *value,
 }
 int RedisConn::indexList(const std::string &key, int index,
                          std::string &value) {
-    return indexList(key.c_str(), key.size(), index,
-                     const_cast<char *>(value.c_str()), value.size());
+    redisReply *reply = nullptr;
+    reply = reinterpret_cast<redisReply *>(
+        command("LINDEX %b %d", key.c_str(), key.size(), index));
+    REDIS_NORMAL_JUDGE(reply);
+
+    int len = (int)reply->len;
+    value = std::string(reply->str, reply->len);
+    freeReplyObject(reply);
+
+    return len;
 }
 
 int RedisConn::lenList(const char *key, int keyLen) {

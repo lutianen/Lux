@@ -9,24 +9,23 @@
 #include <string>
 #include <vector>
 
-const std::string ICON = R"Ziwi(
+const std::string ICON = R"Lux(
 
-         ,----,                                
-       .'   .`|                                
-    .'   .'   ;  ,**,                  ,**,    
-  ,---, '    .',**.'*           .---.,**.'*    
-  |   :     ./ *  *,           /. ./|*  *,     
-  ;   | .'  /  `**'_        .-'-. ' |`**'_     
-  `---' /  ;   ,' ,'|      /___/ \: |,' ,'|    
-    /  ;  /    '  | |   .-'.. '   ' .'  | |    
-   ;  /  /--,  |  | :  /___/ \:     '|  | :    
-  /  /  / .`|  '  : |__.   \  ' .\   '  : |__  
-./__;       :  |  | '.'|\   \   ' \ ||  | '.'| 
-|   :     .'   ;  :    ; \   \  |--" ;  :    ; 
-;   |  .'      |  ,   /   \   \ |    |  ,   /  
-`---'           ---`-'     '---"      ---`-'   
-
-)Ziwi";
+   ,--,                                
+,---.'|                                
+|   | :                                
+:   : |                                
+|   ' :             ,--,               
+;   ; '           ,'_ /|   ,--,  ,--,  
+'   | |__    .--. |  | :   |'. \/ .`|  
+|   | :.'| ,'_ /| :  . |   '  \/  / ;  
+'   :    ; |  ' | |  . .    \  \.' /   
+|   |  ./  |  | ' |  | |     \  ;  ;   
+;   : ;    :  | : ;  ; |    / \  \  \  
+|   ,/     '  :  `--'   \ ./__;   ;  \ 
+'---'      :  ,      .-./ |   :/\  \ ; 
+            `--`----'     `---'  `--`  
+)Lux";
 
 int main() {
     std::cout << ICON << std::endl;
@@ -56,6 +55,10 @@ int main() {
                   << std::endl;
         std::cout << "Test getKey: " << temp.get() << std::endl;
 
+        std::string t;
+        std::cout << conn.getKey(key, t) << std::endl;
+        std::cout << "Test STL getKey: " << t << std::endl;
+
         // ---
         std::string kb{"b"};
         std::string vb{"vb"};
@@ -84,6 +87,11 @@ int main() {
                   << std::endl;
         std::cout << "Test getKey: " << temp1.get() << std::endl;
 
+        std::string t1;
+        std::cout << conn.getKey(key, t1) << std::endl;
+        std::cout << "Test STL getKey: " << t1 << std::endl;
+
+
         std::cout << "Test getLen: " << conn.getLen(kc.c_str(), kc.size())
                   << std::endl;
 
@@ -94,6 +102,10 @@ int main() {
                                         temp1.get(), 128)
                   << std::endl;
         std::cout << temp1.get() << std::endl;
+
+        std::string t2;
+        std::cout << conn.getKeyByRange(kc, 0, 2, t2) << std::endl;
+        std::cout << "Test STL getkeyByRange: " << t2 << std::endl;
 
         // ---
         std::cout << "Test getKeyRemainLifeTime: "
@@ -106,6 +118,10 @@ int main() {
                   << conn.getKeyType(kc.c_str(), kc.size(), temp1.get(), 128)
                   << std::endl;
         std::cout << temp1.get() << std::endl;
+
+        std::string t3;
+        std::cout << conn.getKeyType(kc, t3) << std::endl;
+        std::cout << "Test STL getkeyType: " << t3 << std::endl;
 
         // ---
         std::cout << "Test delKey: " << conn.delKey(key.c_str(), key.size())
@@ -173,11 +189,28 @@ int main() {
                   << std::endl;
         std::cout << "Test lpopList: " << lva.get() << std::endl;
 
+         for (int i = 0; i < 2; ++i) {
+            std::string v = std::to_string(i);
+            conn.lpushList(lka.c_str(), lka.size(), v.c_str(), v.size());
+        }
+
+        std::string t0;
+        std::cout << conn.lpopList(lka, t0) << std::endl;
+        std::cout << "Test STL lpopList: " << t0 << std::endl;
+
         // ---
         Lux::memZero(lva.get(), 64);
         std::cout << conn.rpopList(lka.c_str(), lka.size(), lva.get(), 64)
                   << std::endl;
         std::cout << "Test rpopList: " << lva.get() << std::endl;
+
+        for (int i = 0; i < 2; ++i) {
+            std::string v = std::to_string(i);
+            conn.lpushList(lka.c_str(), lka.size(), v.c_str(), v.size());
+        }
+        std::string t1;
+        std::cout << conn.rpopList(lka, t1) << std::endl;
+        std::cout << "Test STL rpopList: " << t1 << std::endl;
 
         // ---
         int index = 2;
@@ -186,6 +219,10 @@ int main() {
                                     64)
                   << std::endl;
         std::cout << "Test indexList: " << lva.get() << std::endl;
+        
+        std::string t2;
+        std::cout << conn.indexList(lka, index, t2) << std::endl;
+        std::cout << "Test STL indexList: " << t2 << std::endl;
 
         // ---
         std::cout << "Test lenList: " << conn.lenList(lka.c_str(), lka.size())
@@ -231,6 +268,10 @@ int main() {
                   << std::endl;
 
         std::cout << "Test getHField: " << val.get() << std::endl;
+
+        std::string t0;
+        std::cout << conn.getHField(hka, hfa, t0) << std::endl;
+        std::cout << "Test STL getHField: " << t0 << std::endl;
 
         // ---
         std::cout << "Test delHField: "

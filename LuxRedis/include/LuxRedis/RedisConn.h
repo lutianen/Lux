@@ -154,7 +154,7 @@ public:
 
     /**
      * @brief 获取 key 对应的 value 的长度
-     *
+     *  STRLEN key
      * @param key
      * @param keyLen
      * @return int 返回长度，0代表不存在
@@ -271,7 +271,7 @@ public:
      * @param fieldLen
      * @param value
      * @param valueLen
-     * @return int
+     * @return int 0 - success
      */
     int setHField(const char *key, int keyLen, const char *field, int fieldLen,
                   const char *value, int valueLen);
@@ -279,7 +279,7 @@ public:
                   std::string &value);
 
     /**
-     * @brief
+     * @brief hash 表中获取 field 的值
      *
      * @param key
      * @param keyLen
@@ -294,30 +294,92 @@ public:
     int getHField(const std::string &key, const std::string &field,
                   std::string &value);
 
+    /**
+     * @brief 删除 hash 表中的 field
+     *
+     * @param key
+     * @param keyLen
+     * @param field
+     * @param fieldLen
+     * @return int
+     */
     int delHField(const char *key, int keyLen, const char *field, int fieldLen);
     int delHField(const std::string &key, const std::string &field);
 
+    /**
+     * @brief 判断 hash 表中是否存在 field
+     *
+     * @param key
+     * @param keyLen
+     * @param field
+     * @param fieldLen
+     * @return int
+     */
     int hasHField(const char *key, int keyLen, const char *field, int fieldLen);
     int hasHField(const std::string &key, const std::string &field);
 
+    /**
+     * @brief 将 hash 表中的 field 的值增加 addValue，retValue
+     * 用于接收增加后的值
+     *
+     * @param key
+     * @param keyLen
+     * @param field
+     * @param fieldLen
+     * @param addValue
+     * @param retValue
+     * @return int
+     */
     int incrHByFloat(const char *key, int keyLen, const char *field,
                      int fieldLen, double addValue, double &retValue);
     int incrHByFloat(const std::string &key, const std::string &field,
                      double addValue, double &retValue);
 
+    /**
+     * @brief 获取 hash 表中的所有的 field
+     *
+     * @param key
+     * @param keyLen
+     * @param vstrFieldValue
+     * @return int
+     */
     int getHAll(const char *key, int keyLen,
                 std::vector<std::string> &vstrFieldValue);
     int getHAll(const std::string &key,
                 std::vector<std::string> &vstrFieldValue);
 
+    /**
+     * @brief  统计 hash 表中的 field 的个数
+     *
+     * @param key
+     * @param keyLen
+     * @return int
+     */
     int getHFieldCount(const char *key, int keyLen);
     int getHFieldCount(const std::string &key);
 
+    /**
+     * @brief 设置 hash 表中的多个 field
+     *
+     * @param key
+     * @param keyLen
+     * @param vstrField
+     * @return int
+     */
     int setMultiHField(const char *key, int keyLen,
                        const std::vector<std::string> &vstrFieldValue);
     int setMultiHField(const std::string &key,
                        const std::vector<std::string> &vstrFieldValue);
 
+    /**
+     * @brief 获取 hash 表中的多个 field
+     *
+     * @param key
+     * @param keyLen
+     * @param vstrField
+     * @param vstrValue
+     * @return int
+     */
     int getMultiHField(const char *key, int keyLen,
                        const std::vector<std::string> &vstrField,
                        std::vector<std::string> &vstrValue);
@@ -325,6 +387,14 @@ public:
                        const std::vector<std::string> &vstrField,
                        std::vector<std::string> &vstrValue);
 
+    /**
+     * @brief 删除 hash 表中的多个 field
+     *
+     * @param key
+     * @param keyLen
+     * @param vstrField
+     * @return int
+     */
     int delMultiHField(const char *key, int keyLen,
                        const std::vector<std::string> &vstrField);
     int delMultiHField(const std::string &key,
