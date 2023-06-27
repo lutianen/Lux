@@ -87,7 +87,7 @@ bool LogFile::rollFile() {
 }
 
 /**
- * @brief Set the fileName of log.
+ * @brief Get the fileName of log.
  * E.g  basename.YYYYmmdd-HHMMSS.HOSTNAME.PID.log
  */
 string LogFile::getLogFileName(const string& basename, time_t* now) {
